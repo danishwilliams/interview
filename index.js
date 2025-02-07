@@ -1,0 +1,40 @@
+"use strict";
+function generateFunding(startups, lps) {
+    startups.forEach(startup => {
+        lps.some(lp => {
+            const neededFundingRemaining = startup.fundingNeeded - startup.funded;
+            if (lp.money > neededFundingRemaining) {
+                // LP has enough to fulfill entire neededFundingRemaining
+                startup.funded += neededFundingRemaining;
+                lp.money -= neededFundingRemaining;
+                startup.lpFunding.push({ lp: lp, funding: neededFundingRemaining });
+                return true; //break out of lps loop
+            }
+            else if (lp.money > 0) {
+                // LP can't fulfill entire neededFundingRemaining but has some funds
+                startup.funded += lp.money;
+                startup.lpFunding.push({ lp: lp, funding: lp.money }); //Add amount
+                lp.money = 0;
+            }
+            else {
+                // LP is has no funds, remove from lps array
+                lps = lps.filter(lpItem => lpItem.name != lp.name);
+            }
+        });
+    });
+}
+const startups = [
+    { name: "amce", fundingNeeded: 100, funded: 0, lpFunding: [] },
+    { name: "reddog", fundingNeeded: 90, funded: 0, lpFunding: [] },
+    { name: "bluedog", fundingNeeded: 50, funded: 0, lpFunding: [] }
+];
+const lps = [
+    { name: "money_corp", money: 110 },
+    { name: "abc_corp", money: 20 }
+];
+
+generateFunding(startups, lps);
+
+startups.forEach(startup => {
+    console.log(startup.name + ' funded by: ' + JSON.stringify(startup.lpFunding.map(funding => funding.lp.name + ' -> ' + funding.funding)));
+});
