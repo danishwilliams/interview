@@ -24,7 +24,7 @@ function generateFunding(startups: Startup[], lps: LP[]) {
                 
                 startup.lpFunding.push({lp: lp, funding: neededFundingRemaining})
 
-                return true //break out of lps loop
+                return true //Startup in fully funded, break out of lps loop
             } else if (lp.money > 0) {
                 // LP can't fulfill entire neededFundingRemaining but has some funds
                 startup.funded += lp.money
@@ -45,7 +45,8 @@ const startups: Startup[] = [
 ];
 const lps: LP[] = [
     {name: "money_corp", money: 110},
-    {name: "abc_corp", money: 20}
+    {name: "abc_corp", money: 20},
+    { name: "xyz_corp", money: 200 }
 ]
 
 generateFunding(startups, lps)
