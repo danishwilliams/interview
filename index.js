@@ -1,6 +1,8 @@
 "use strict";
 function generateFunding(startups, lps) {
-    startups.forEach(startup => {
+    startups.some(startup => {
+        if (lps.length == 0)
+            return true; // All LPs have run out of funds, break out of startup loop
         lps.some(lp => {
             const neededFundingRemaining = startup.fundingNeeded - startup.funded;
             if (lp.money > neededFundingRemaining) {
@@ -13,8 +15,10 @@ function generateFunding(startups, lps) {
             else if (lp.money > 0) {
                 // LP can't fulfill entire neededFundingRemaining but has some funds
                 startup.funded += lp.money;
-                startup.lpFunding.push({ lp: lp, funding: lp.money }); //Add amount
+                startup.lpFunding.push({ lp: lp, funding: lp.money });
                 lp.money = 0;
+                // LP is has no funds, remove from lps array
+                lps = lps.filter(lpItem => lpItem.name != lp.name);
             }
             else {
                 // LP is has no funds, remove from lps array
@@ -26,16 +30,16 @@ function generateFunding(startups, lps) {
 const startups = [
     { name: "amce", fundingNeeded: 100, funded: 0, lpFunding: [] },
     { name: "reddog", fundingNeeded: 90, funded: 0, lpFunding: [] },
-    { name: "bluedog", fundingNeeded: 50, funded: 0, lpFunding: [] }
+    { name: "bluedog", fundingNeeded: 50, funded: 0, lpFunding: [] },
+    { name: "greendog", fundingNeeded: 200, funded: 0, lpFunding: [] },
+    { name: "blackdog", fundingNeeded: 300, funded: 0, lpFunding: [] },
 ];
 const lps = [
     { name: "money_corp", money: 110 },
-    { name: "abc_corp", money: 10 },
+    { name: "abc_corp", money: 20 },
     { name: "xyz_corp", money: 200 }
 ];
-
 generateFunding(startups, lps);
-
 startups.forEach(startup => {
     console.log(startup.name + ' funded by: ' + JSON.stringify(startup.lpFunding.map(funding => funding.lp.name + ' -> ' + funding.funding)));
 });
